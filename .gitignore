@@ -1,9 +1,11 @@
 # Virtual Environment
 .venv/
+venv/
 
 # Python Cache
 __pycache__/
 *.pyc
+*.pyo
 
 # Jupyter
 .ipynb_checkpoints/
@@ -14,9 +16,18 @@ Thumbs.db
 
 # VS Code
 .vscode/
+.idea/
 
-# Large model files (optional)
-# models/
+# Environment Variables
+.env
 
-# Dataset (optional if too large)
-# dataset/
+# Database
+*.db
+
+# Uploaded Images
+uploads/*.jpg
+uploads/*.jpeg
+uploads/*.png
+
+# Temporary / Log Files
+*.log
