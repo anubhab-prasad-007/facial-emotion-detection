@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Live Emotion Detection</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      color: #ffffff;
+
+      background:
+        radial-gradient(circle at top left, #263b73, transparent 40%),
+        radial-gradient(circle at bottom right, #172554, transparent 40%),
+        #080b14;
+
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 950px;
+      margin: auto;
+    }
+
+    /* HEADER */
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin-bottom: 10px;
+
+      background: linear-gradient(90deg, #ffffff, #8ab4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #aeb9d0;
+      font-size: 16px;
+    }
+
+    /* CARD */
+
+    .card {
+      background: rgba(20, 27, 45, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+
+      padding: 30px;
+      border-radius: 20px;
+
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.35);
+
+      margin-bottom: 25px;
+    }
+
+    .camera-card {
+      text-align: center;
+    }
+
+    .camera-title {
+      margin-bottom: 20px;
+    }
+
+    /* VIDEO */
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 650px;
+
+      margin: auto;
+
+      background: #05070c;
+
+      border-radius: 18px;
+      overflow: hidden;
+
+      border: 2px solid #33456f;
+    }
+
+    video {
+      display: block;
+
+      width: 100%;
+      min-height: 350px;
+
+      object-fit: cover;
+
+      background: #05070c;
+    }
+
+    /* CAMERA STATUS */
+
+    .camera-status {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      margin-top: 18px;
+
+      padding: 8px 15px;
+
+      border-radius: 20px;
+
+      background: #182235;
+
+      color: #aeb9d0;
+
+      font-size: 14px;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+
+      border-radius: 50%;
+
+      background: #777;
+    }
+
+    .status-active {
+      background: #22c55e;
+
+      box-shadow:
+        0 0 10px rgba(34, 197, 94, 0.7);
+    }
+
+    /* BUTTONS */
+
+    .camera-buttons {
+      margin-top: 22px;
+    }
+
+    button {
+      border: none;
+
+      padding: 13px 25px;
+
+      margin: 7px;
+
+      border-radius: 9px;
+
+      cursor: pointer;
+
+      font-size: 15px;
+
+      font-weight: 600;
+
+      color: white;
+
+      transition: 0.25s;
+    }
+
+    #startBtn {
+      background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #6366f1
+      );
+
+      box-shadow:
+        0 5px 15px rgba(59, 130, 246, 0.25);
+    }
+
+    #captureBtn {
+      background: linear-gradient(
+        135deg,
+        #7c3aed,
+        #6366f1
+      );
+
+      box-shadow:
+        0 5px 15px rgba(124, 58, 237, 0.25);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+
+      cursor: not-allowed;
+
+      transform: none;
+    }
+
+    /* RESULT */
+
+    .result {
+      text-align: center;
+    }
+
+    .result h2 {
+      margin-bottom: 20px;
+    }
+
+    .result-image {
+      width: 100%;
+
+      max-width: 550px;
+
+      max-height: 500px;
+
+      object-fit: contain;
+
+      border-radius: 15px;
+
+      display: block;
+
+      margin: 10px auto 25px;
+
+      border: 2px solid #33456f;
+    }
+
+    .emotion {
+      font-size: 42px;
+
+      font-weight: bold;
+
+      color: #8ab4ff;
+
+      margin: 15px 0;
+    }
+
+    .confidence {
+      color: #b9c4d8;
+
+      font-size: 18px;
+
+      margin-bottom: 25px;
+    }
+
+    .confidence strong {
+      color: #ffffff;
+    }
+
+    /* PROBABILITIES */
+
+    .probabilities {
+      text-align: left;
+
+      max-width: 700px;
+
+      margin: auto;
+    }
+
+    .probabilities h3 {
+      text-align: center;
+
+      margin-bottom: 25px;
+    }
+
+    .bar-container {
+      margin: 17px 0;
+    }
+
+    .bar-label {
+      display: flex;
+
+      justify-content: space-between;
+
+      margin-bottom: 7px;
+
+      color: #dce4f3;
+    }
+
+    .bar {
+      width: 100%;
+
+      height: 12px;
+
+      background: #202a3d;
+
+      border-radius: 20px;
+
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+
+      background:
+        linear-gradient(
+          90deg,
+          #3b82f6,
+          #8b5cf6
+        );
+
+      border-radius: 20px;
+
+      transition: width 0.8s ease;
+    }
+
+    /* ERROR */
+
+    .error {
+      color: #ff8585;
+
+      background: rgba(255, 0, 0, 0.08);
+
+      padding: 14px;
+
+      border-radius: 10px;
+
+      text-align: center;
+    }
+
+    /* NAVIGATION */
+
+    .navigation-buttons {
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      gap: 15px;
+
+      margin: 30px auto;
+
+      max-width: 950px;
+    }
+
+    .navigation-buttons a {
+      text-decoration: none;
+    }
+
+    .nav-button {
+      min-width: 230px;
+    }
+
+    .primary-nav {
+      background:
+        linear-gradient(
+          135deg,
+          #3b82f6,
+          #6366f1
+        );
+
+      color: white;
+    }
+
+    .secondary-button {
+      background: #182235;
+
+      color: white;
+
+      border: 1px solid #6b82ad;
+
+      box-shadow: none;
+    }
+
+    .secondary-button:hover {
+      background: #293958;
+    }
+
+    /* FOOTER */
+
+    .footer {
+      text-align: center;
+
+      color: #69758c;
+
+      font-size: 13px;
+
+      margin-top: 25px;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 600px) {
+
+      body {
+        padding: 25px 12px;
+      }
+
+      h1 {
+        font-size: 31px;
+      }
+
+      .logo {
+        font-size: 40px;
+      }
+
+      .card {
+        padding: 20px 15px;
+      }
+
+      video {
+        min-height: 260px;
+      }
+
+      .emotion {
+        font-size: 34px;
+      }
+
+      .camera-buttons {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+      }
+
+      .camera-buttons button {
+        width: 250px;
+      }
+
+      .navigation-buttons {
+        flex-direction: column;
+      }
+
+      .navigation-buttons button {
+        width: 260px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+      <div class="logo">
+        🎥
+      </div>
+
+      <h1>
+        Live Emotion Detection
+      </h1>
+
+      <p class="subtitle">
+        Real-time facial emotion detection using Deep Learning
+      </p>
+
+    </div>
+
+
+    <!-- CAMERA -->
+
+    <div class="card camera-card">
+
+      <h2 class="camera-title">
+        📷 Camera Detection
+      </h2>
+
+      <p class="subtitle">
+        Allow camera access and capture your face
+      </p>
+
+      <br />
+
+
+      <!-- VIDEO -->
+
+      <div class="video-wrapper">
+
+        <video
+          id="video"
+          autoplay
+          playsinline
+          muted
+        ></video>
+
+      </div>
+
+
+      <!-- STATUS -->
+
+      <div class="camera-status">
+
+        <span
+          id="statusDot"
+          class="status-dot"
+        ></span>
+
+        <span id="statusText">
+          Camera not started
+        </span>
+
+      </div>
+
+
+      <!-- BUTTONS -->
+
+      <div class="camera-buttons">
+
+        <button id="startBtn">
+          📷 Start Camera
+        </button>
+
+        <button
+          id="captureBtn"
+          disabled
+        >
+          🔍 Capture & Detect
+        </button>
+
+      </div>
+
+
+      <!-- CANVAS -->
+
+      <canvas
+        id="canvas"
+        style="display:none;"
+      ></canvas>
+
+
+      <!-- FORM -->
+
+      <form
+        id="uploadForm"
+        method="POST"
+        enctype="multipart/form-data"
+        style="display:none;"
+      >
+
+        <input
+          type="file"
+          name="image"
+          id="imageInput"
+          accept="image/jpeg,image/png"
+        />
+
+      </form>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    {% if error %}
+
+    <div class="card">
+
+      <p class="error">
+        ⚠️ {{ error }}
+      </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- RESULT -->
+
+    {% if emotion %}
+
+    <div class="card result">
+
+      <h2>
+        ✨ Prediction Result
+      </h2>
+
+
+      <img
+        src="{{ url_for(
+          'uploaded_file',
+          filename=image
+        ) }}"
+        class="result-image"
+        alt="Emotion prediction result"
+      />
+
+
+      <div class="emotion">
+
+        {% if emotion == "Happy" %}
+
+          😊
+
+        {% elif emotion == "Sad" %}
+
+          😢
+
+        {% elif emotion == "Angry" %}
+
+          😠
+
+        {% elif emotion == "Fear" %}
+
+          😨
+
+        {% elif emotion == "Disgust" %}
+
+          🤢
+
+        {% elif emotion == "Surprise" %}
+
+          😲
+
+        {% else %}
+
+          😐
+
+        {% endif %}
+
+        {{ emotion }}
+
+      </div>
+
+
+      <div class="confidence">
+
+        Model Confidence:
+
+        <strong>
+          {{ confidence }}%
+        </strong>
+
+      </div>
+
+
+      <!-- PROBABILITIES -->
+
+      <div class="probabilities">
+
+        <h3>
+          Emotion Probabilities
+        </h3>
+
+
+        {% for label, probability in probabilities.items() %}
+
+        <div class="bar-container">
+
+          <div class="bar-label">
+
+            <span>
+
+              {% if label == "Happy" %}
+
+                😊
+
+              {% elif label == "Sad" %}
+
+                😢
+
+              {% elif label == "Angry" %}
+
+                😠
+
+              {% elif label == "Fear" %}
+
+                😨
+
+              {% elif label == "Disgust" %}
+
+                🤢
+
+              {% elif label == "Surprise" %}
+
+                😲
+
+              {% else %}
+
+                😐
+
+              {% endif %}
+
+              {{ label }}
+
+            </span>
+
+
+            <span>
+              {{ "%.2f"|format(probability) }}%
+            </span>
+
+          </div>
+
+
+          <div class="bar">
+
+            <div
+              class="fill"
+              style="width: {{ probability }}%;"
+            ></div>
+
+          </div>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+
+
+  <!-- NAVIGATION -->
+
+  <div class="navigation-buttons">
+
+    <a href="/">
+
+      <button
+        type="button"
+        class="nav-button primary-nav"
+      >
+        📷 Image Prediction
+      </button>
+
+    </a>
+
+
+    <a href="/dashboard">
+
+      <button
+        type="button"
+        class="nav-button secondary-button"
+      >
+        📊 Emotion Dashboard
+      </button>
+
+    </a>
+
+  </div>
+
+
+  <!-- FOOTER -->
+
+  <div class="footer">
+
+    Facial Emotion AI • Deep Learning Project
+
+  </div>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    /* ================================
+       ELEMENTS
+    ================================= */
+
+    const video =
+      document.getElementById("video");
+
+    const canvas =
+      document.getElementById("canvas");
+
+    const startBtn =
+      document.getElementById("startBtn");
+
+    const captureBtn =
+      document.getElementById("captureBtn");
+
+    const uploadForm =
+      document.getElementById("uploadForm");
+
+    const imageInput =
+      document.getElementById("imageInput");
+
+    const statusText =
+      document.getElementById("statusText");
+
+    const statusDot =
+      document.getElementById("statusDot");
+
+
+    /* ================================
+       CAMERA STREAM
+    ================================= */
+
+    let stream = null;
+
+
+    /* ================================
+       CHECK CAMERA SUPPORT
+    ================================= */
+
+    function cameraSupported() {
+
+      return (
+        navigator.mediaDevices &&
+        navigator.mediaDevices.getUserMedia
+      );
+
+    }
+
+
+    /* ================================
+       START CAMERA
+    ================================= */
+
+    startBtn.addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          console.log(
+            "Starting camera..."
+          );
+
+
+          /* Check browser support */
+
+          if (!cameraSupported()) {
+
+            throw new Error(
+              "Camera API is not supported by this browser."
+            );
+
+          }
+
+
+          /* Stop old stream if exists */
+
+          if (stream) {
+
+            stream
+              .getTracks()
+              .forEach(
+                track => track.stop()
+              );
+
+          }
+
+
+          /* Request camera */
+
+          stream =
+            await navigator.mediaDevices.getUserMedia({
+
+              video: {
+
+                width: {
+                  ideal: 1280
+                },
+
+                height: {
+                  ideal: 720
+                },
+
+                facingMode: "user"
+
+              },
+
+              audio: false
+
+            });
+
+
+          console.log(
+            "Camera permission granted"
+          );
+
+
+          /* Attach stream */
+
+          video.srcObject = stream;
+
+
+          /* Wait for video metadata */
+
+          video.onloadedmetadata =
+            async () => {
+
+              try {
+
+                await video.play();
+
+
+                console.log(
+                  "Camera started successfully"
+                );
+
+                console.log(
+                  "Video size:",
+                  video.videoWidth,
+                  "x",
+                  video.videoHeight
+                );
+
+
+                /* Enable capture */
+
+                captureBtn.disabled = false;
+
+
+                /* Update status */
+
+                statusText.textContent =
+                  "Camera active";
+
+                statusDot.classList.add(
+                  "status-active"
+                );
+
+
+                /* Update button */
+
+                startBtn.textContent =
+                  "✅ Camera Started";
+
+                startBtn.disabled = true;
+
+              }
+
+              catch (playError) {
+
+                console.error(
+                  "Video playback error:",
+                  playError
+                );
+
+                statusText.textContent =
+                  "Video playback failed";
+
+              }
+
+            };
+
+
+        }
+
+        catch (error) {
+
+          console.error(
+            "Camera error:",
+            error
+          );
+
+
+          statusText.textContent =
+            "Camera unavailable";
+
+
+          statusDot.classList.remove(
+            "status-active"
+          );
+
+
+          captureBtn.disabled = true;
+
+
+          alert(
+            "Unable to access camera.\n\n" +
+
+            "Please check:\n" +
+
+            "1. Camera permission is allowed.\n" +
+
+            "2. No other application is using the webcam.\n" +
+
+            "3. Your webcam is connected.\n\n" +
+
+            "Error: " +
+            error.message
+          );
+
+        }
+
+      }
+    );
+
+
+    /* ================================
+       CAPTURE IMAGE
+    ================================= */
+
+    captureBtn.addEventListener(
+      "click",
+      () => {
+
+        try {
+
+          /* Check stream */
+
+          if (!stream) {
+
+            alert(
+              "Please start the camera first."
+            );
+
+            return;
+
+          }
+
+
+          /* Check video dimensions */
+
+          if (
+            video.videoWidth === 0 ||
+            video.videoHeight === 0
+          ) {
+
+            alert(
+              "Camera video is not ready yet. Please wait a moment and try again."
+            );
+
+            return;
+
+          }
+
+
+          /* Set canvas size */
+
+          canvas.width =
+            video.videoWidth;
+
+          canvas.height =
+            video.videoHeight;
+
+
+          /* Get drawing context */
+
+          const context =
+            canvas.getContext("2d");
+
+
+          /* Draw video frame */
+
+          context.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+
+          /* Convert to image */
+
+          canvas.toBlob(
+            (blob) => {
+
+              if (!blob) {
+
+                alert(
+                  "Failed to capture image."
+                );
+
+                return;
+
+              }
+
+
+              /* Create image file */
+
+              const file =
+                new File(
+                  [blob],
+                  "webcam_capture.jpg",
+                  {
+                    type: "image/jpeg"
+                  }
+                );
+
+
+              /* Put file into input */
+
+              const dataTransfer =
+                new DataTransfer();
+
+
+              dataTransfer.items.add(
+                file
+              );
+
+
+              imageInput.files =
+                dataTransfer.files;
+
+
+              /* Update status */
+
+              statusText.textContent =
+                "Analyzing emotion...";
+
+
+              /* Disable capture button */
+
+              captureBtn.disabled =
+                true;
+
+
+              /* Submit to Flask */
+
+              uploadForm.submit();
+
+            },
+
+            "image/jpeg",
+
+            0.95
+
+          );
+
+        }
+
+        catch (error) {
+
+          console.error(
+            "Capture error:",
+            error
+          );
+
+          alert(
+            "Failed to capture image."
+          );
+
+        }
+
+      }
+    );
+
+
+    /* ================================
+       PAGE LOAD
+    ================================= */
+
+    window.addEventListener(
+      "load",
+      () => {
+
+        console.log(
+          "Emotion detection page loaded"
+        );
+
+
+        if (!cameraSupported()) {
+
+          statusText.textContent =
+            "Camera not supported";
+
+          startBtn.disabled = true;
+
+          console.error(
+            "getUserMedia is not supported."
+          );
+
+        }
+
+      }
+    );
+
+
+    /* ================================
+       STOP CAMERA WHEN LEAVING PAGE
+    ================================= */
+
+    window.addEventListener(
+      "beforeunload",
+      () => {
+
+        if (stream) {
+
+          stream
+            .getTracks()
+            .forEach(
+              track => track.stop()
+            );
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+
+</html>

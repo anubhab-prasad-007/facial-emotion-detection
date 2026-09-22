@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8" />
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>Facial Emotion AI</title>
+
+
+    <style>
+
+        /* ================================
+           GLOBAL
+        ================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            min-height: 100vh;
+
+            color: #f8fafc;
+
+            background:
+
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(6, 182, 212, 0.20),
+                    transparent 35%
+                ),
+
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(139, 92, 246, 0.20),
+                    transparent 35%
+                ),
+
+                #050816;
+
+            padding: 40px 20px;
+        }
+
+
+        /* ================================
+           CONTAINER
+        ================================= */
+
+        .container {
+
+            width: 100%;
+
+            max-width: 950px;
+
+            margin: auto;
+        }
+
+
+        /* ================================
+           HEADER
+        ================================= */
+
+        .header {
+
+            text-align: center;
+
+            margin-bottom: 35px;
+        }
+
+
+        .logo {
+
+            font-size: 52px;
+
+            margin-bottom: 10px;
+
+            filter:
+                drop-shadow(
+                    0 0 15px
+                    rgba(34, 211, 238, 0.5)
+                );
+        }
+
+
+        h1 {
+
+            font-size: 42px;
+
+            margin-bottom: 10px;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    #22d3ee,
+                    #a78bfa,
+                    #8b5cf6
+                );
+
+            -webkit-background-clip: text;
+
+            -webkit-text-fill-color: transparent;
+
+            background-clip: text;
+        }
+
+
+        .subtitle {
+
+            color: #94a3b8;
+
+            font-size: 17px;
+        }
+
+
+        /* ================================
+           CARDS
+        ================================= */
+
+        .card {
+
+            background:
+                rgba(15, 23, 42, 0.92);
+
+            border:
+                1px solid
+                rgba(34, 211, 238, 0.15);
+
+            padding: 32px;
+
+            border-radius: 20px;
+
+            box-shadow:
+
+                0 15px 45px
+                rgba(0, 0, 0, 0.45),
+
+                0 0 30px
+                rgba(6, 182, 212, 0.05);
+
+            margin-bottom: 25px;
+        }
+
+
+        /* ================================
+           UPLOAD
+        ================================= */
+
+        .upload-box {
+
+            text-align: center;
+        }
+
+
+        .upload-box h2 {
+
+            margin-bottom: 8px;
+
+            color: #f8fafc;
+        }
+
+
+        .upload-description {
+
+            color: #94a3b8;
+
+            margin-bottom: 25px;
+        }
+
+
+        .upload-area {
+
+            border:
+                2px dashed
+                #155e75;
+
+            border-radius: 15px;
+
+            padding: 35px 20px;
+
+            transition: 0.3s;
+
+            background:
+                rgba(6, 182, 212, 0.02);
+        }
+
+
+        .upload-area:hover {
+
+            border-color: #22d3ee;
+
+            background:
+                rgba(6, 182, 212, 0.08);
+
+            box-shadow:
+
+                0 0 25px
+                rgba(6, 182, 212, 0.10);
+        }
+
+
+        .upload-icon {
+
+            font-size: 48px;
+
+            margin-bottom: 12px;
+
+            filter:
+                drop-shadow(
+                    0 0 10px
+                    rgba(34, 211, 238, 0.4)
+                );
+        }
+
+
+        .upload-area p {
+
+            color: #cbd5e1;
+        }
+
+
+        /* ================================
+           FILE INPUT
+        ================================= */
+
+        input[type="file"] {
+
+            width: 100%;
+
+            max-width: 400px;
+
+            margin: 15px auto;
+
+            padding: 10px;
+
+            background: #0b1120;
+
+            color: #ffffff;
+
+            border:
+                1px solid
+                #334155;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+
+        input[type="file"]:hover {
+
+            border-color: #22d3ee;
+        }
+
+
+        /* ================================
+           BUTTONS
+        ================================= */
+
+        button {
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #06b6d4,
+                    #8b5cf6
+                );
+
+            color: white;
+
+            border: none;
+
+            padding: 13px 26px;
+
+            border-radius: 9px;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            transition: 0.25s;
+
+            box-shadow:
+
+                0 5px 20px
+                rgba(6, 182, 212, 0.25);
+        }
+
+
+        button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+
+                0 8px 25px
+                rgba(34, 211, 238, 0.35);
+        }
+
+
+        /* ================================
+           IMAGE PREVIEW
+        ================================= */
+
+        .preview {
+
+            display: none;
+
+            max-width: 350px;
+
+            max-height: 350px;
+
+            margin: 20px auto;
+
+            border-radius: 15px;
+
+            border:
+                2px solid
+                #22d3ee;
+
+            box-shadow:
+
+                0 0 20px
+                rgba(34, 211, 238, 0.15);
+        }
+
+
+        /* ================================
+           ERROR
+        ================================= */
+
+        .error {
+
+            color: #fda4af;
+
+            background:
+                rgba(244, 63, 94, 0.08);
+
+            border:
+                1px solid
+                rgba(244, 63, 94, 0.20);
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            margin-top: 20px;
+        }
+
+
+        /* ================================
+           RESULT
+        ================================= */
+
+        .result {
+
+            text-align: center;
+        }
+
+
+        .result h2 {
+
+            margin-bottom: 20px;
+
+            color: #e2e8f0;
+        }
+
+
+        .result-image {
+
+            width: 100%;
+
+            max-width: 550px;
+
+            max-height: 500px;
+
+            object-fit: contain;
+
+            border-radius: 15px;
+
+            display: block;
+
+            margin: 10px auto 25px;
+
+            border:
+                2px solid
+                #164e63;
+
+            box-shadow:
+
+                0 0 25px
+                rgba(6, 182, 212, 0.10);
+        }
+
+
+        /* ================================
+           EMOTION
+        ================================= */
+
+        .emotion {
+
+            font-size: 42px;
+
+            font-weight: bold;
+
+            margin: 10px 0;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    #22d3ee,
+                    #a78bfa
+                );
+
+            -webkit-background-clip: text;
+
+            -webkit-text-fill-color: transparent;
+
+            background-clip: text;
+        }
+
+
+        /* ================================
+           CONFIDENCE
+        ================================= */
+
+        .confidence {
+
+            font-size: 19px;
+
+            color: #94a3b8;
+
+            margin-bottom: 30px;
+        }
+
+
+        .confidence strong {
+
+            color: #22d3ee;
+        }
+
+
+        /* ================================
+           PROBABILITIES
+        ================================= */
+
+        .probabilities {
+
+            text-align: left;
+
+            max-width: 700px;
+
+            margin: auto;
+        }
+
+
+        .probabilities h3 {
+
+            text-align: center;
+
+            margin-bottom: 25px;
+
+            color: #e2e8f0;
+        }
+
+
+        .bar-container {
+
+            margin: 17px 0;
+        }
+
+
+        .bar-label {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            color: #cbd5e1;
+
+            margin-bottom: 7px;
+        }
+
+
+        .bar-label span:last-child {
+
+            color: #67e8f9;
+
+            font-weight: 600;
+        }
+
+
+        .bar {
+
+            width: 100%;
+
+            height: 12px;
+
+            background: #172033;
+
+            border-radius: 20px;
+
+            overflow: hidden;
+        }
+
+
+        .fill {
+
+            height: 100%;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    #06b6d4,
+                    #8b5cf6
+                );
+
+            box-shadow:
+
+                0 0 10px
+                rgba(34, 211, 238, 0.25);
+
+            border-radius: 20px;
+
+            transition:
+                width 0.8s ease;
+        }
+
+
+        /* ================================
+           NAVIGATION
+        ================================= */
+
+        .navigation-buttons {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin: 30px auto;
+
+            max-width: 950px;
+        }
+
+
+        .navigation-buttons a {
+
+            text-decoration: none;
+        }
+
+
+        .navigation-buttons button {
+
+            min-width: 230px;
+        }
+
+
+        .secondary-button {
+
+            background:
+
+                rgba(15, 23, 42, 0.90);
+
+            border:
+                1px solid
+                #334155;
+
+            color: #cbd5e1;
+
+            box-shadow: none;
+        }
+
+
+        .secondary-button:hover {
+
+            background:
+
+                rgba(34, 211, 238, 0.08);
+
+            border-color: #22d3ee;
+
+            color: #67e8f9;
+
+            box-shadow:
+
+                0 0 20px
+                rgba(34, 211, 238, 0.10);
+        }
+
+
+        /* ================================
+           FOOTER
+        ================================= */
+
+        .footer {
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            margin-top: 30px;
+        }
+
+
+        /* ================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 600px) {
+
+            body {
+
+                padding:
+                    25px 12px;
+            }
+
+
+            h1 {
+
+                font-size: 32px;
+            }
+
+
+            .logo {
+
+                font-size: 40px;
+            }
+
+
+            .card {
+
+                padding:
+                    22px 16px;
+            }
+
+
+            .emotion {
+
+                font-size: 34px;
+            }
+
+
+            .navigation-buttons {
+
+                flex-direction: column;
+            }
+
+
+            .navigation-buttons button {
+
+                width: 260px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ================================
+         HEADER
+    ================================= -->
+
+    <div class="header">
+
+        <div class="logo">
+            🧠
+        </div>
+
+
+        <h1>
+            Facial Emotion AI
+        </h1>
+
+
+        <p class="subtitle">
+            Detect human emotions using Deep Learning
+        </p>
+
+    </div>
+
+
+
+    <!-- ================================
+         UPLOAD
+    ================================= -->
+
+    <div class="card upload-box">
+
+
+        <h2>
+            Upload a Face Image
+        </h2>
+
+
+        <p class="upload-description">
+            Upload a clear image containing a human face
+        </p>
+
+
+
+        <div class="upload-area">
+
+
+            <div class="upload-icon">
+                📷
+            </div>
+
+
+            <p>
+                Choose an image to analyze
+            </p>
+
+
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    name="image"
+                    accept=".jpg,.jpeg,.png"
+                    required
+                />
+
+
+                <br />
+
+
+                <!-- IMAGE PREVIEW -->
+
+                <img
+                    id="preview"
+                    class="preview"
+                    alt="Image Preview"
+                />
+
+
+                <br />
+
+
+                <button type="submit">
+
+                    🔍 Predict Emotion
+
+                </button>
+
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ERROR -->
+
+        {% if error %}
+
+        <p class="error">
+
+            ⚠️ {{ error }}
+
+        </p>
+
+        {% endif %}
+
+
+    </div>
+
+
+
+    <!-- ================================
+         RESULT
+    ================================= -->
+
+    {% if emotion %}
+
+
+    <div class="card result">
+
+
+        <h2>
+            ✨ Prediction Result
+        </h2>
+
+
+
+        <img
+            src="{{ url_for(
+                'uploaded_file',
+                filename=image
+            ) }}"
+            class="result-image"
+            alt="Emotion prediction result"
+        />
+
+
+
+        <!-- EMOTION -->
+
+        <div class="emotion">
+
+
+            {% if emotion == "Happy" %}
+
+                😊
+
+            {% elif emotion == "Sad" %}
+
+                😢
+
+            {% elif emotion == "Angry" %}
+
+                😠
+
+            {% elif emotion == "Fear" %}
+
+                😨
+
+            {% elif emotion == "Disgust" %}
+
+                🤢
+
+            {% elif emotion == "Surprise" %}
+
+                😲
+
+            {% else %}
+
+                😐
+
+            {% endif %}
+
+
+            {{ emotion }}
+
+
+        </div>
+
+
+
+        <!-- CONFIDENCE -->
+
+        <div class="confidence">
+
+            Model Confidence:
+
+            <strong>
+
+                {{ confidence }}%
+
+            </strong>
+
+        </div>
+
+
+
+        <!-- ================================
+             PROBABILITIES
+        ================================= -->
+
+        <div class="probabilities">
+
+
+            <h3>
+                Emotion Probabilities
+            </h3>
+
+
+
+            {% for label, probability in probabilities.items() %}
+
+
+            <div class="bar-container">
+
+
+                <div class="bar-label">
+
+
+                    <span>
+
+
+                        {% if label == "Happy" %}
+
+                            😊
+
+                        {% elif label == "Sad" %}
+
+                            😢
+
+                        {% elif label == "Angry" %}
+
+                            😠
+
+                        {% elif label == "Fear" %}
+
+                            😨
+
+                        {% elif label == "Disgust" %}
+
+                            🤢
+
+                        {% elif label == "Surprise" %}
+
+                            😲
+
+                        {% else %}
+
+                            😐
+
+                        {% endif %}
+
+
+                        {{ label }}
+
+
+                    </span>
+
+
+                    <span>
+
+                        {{ "%.2f"|format(probability) }}%
+
+                    </span>
+
+
+                </div>
+
+
+
+                <div class="bar">
+
+
+                    <div
+                        class="fill"
+                        style="width: {{ probability }}%;"
+                    ></div>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- ================================
+     NAVIGATION
+================================= -->
+
+<div class="navigation-buttons">
+
+
+    <a href="/webcam">
+
+        <button type="button">
+
+            🎥 Use Live Webcam
+
+        </button>
+
+    </a>
+
+
+
+    <a href="/dashboard">
+
+        <button
+            type="button"
+            class="secondary-button"
+        >
+
+            📊 View Emotion Dashboard
+
+        </button>
+
+    </a>
+
+
+</div>
+
+
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+    Facial Emotion AI • Deep Learning Project
+
+</div>
+
+
+
+<!-- ================================
+     IMAGE PREVIEW SCRIPT
+================================= -->
+
+<script>
+
+
+    const imageInput =
+        document.getElementById(
+            "imageInput"
+        );
+
+
+    const preview =
+        document.getElementById(
+            "preview"
+        );
+
+
+    imageInput.addEventListener(
+        "change",
+        function () {
+
+
+            const file =
+                this.files[0];
+
+
+            if (file) {
+
+
+                preview.src =
+                    URL.createObjectURL(
+                        file
+                    );
+
+
+                preview.style.display =
+                    "block";
+
+
+            }
+
+            else {
+
+
+                preview.style.display =
+                    "none";
+
+            }
+
+        }
+    );
+
+
+</script>
+
+
+</body>
+
+</html>
